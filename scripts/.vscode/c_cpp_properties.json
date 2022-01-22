@@ -1,0 +1,30 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "",
+        "limitSymbolsToIncludedHeaders": true
+      },
+      "includePath": [
+        "/opt/ros/melodic/include/**",
+        "/home/maysara/catkin_ws/devel/include/**",
+        "/home/maysara/catkin_ws/src/autocamera/include/**",
+        "/home/maysara/catkin_ws/src/cisst-saw/cisstNetlib/include/**",
+        "/home/maysara/catkin_ws/src/cisst-saw/cisst-ros/cisst_ros_bridge/include/**",
+        "/home/maysara/catkin_ws/src/cisst-saw/cisst-ros/cisst_ros_crtk/include/**",
+        "/home/maysara/catkin_ws/src/dvrk-ros/dvrk_arms_from_ros/components/include/**",
+        "/home/maysara/catkin_ws/src/dvrk-ros/dvrk_hrsv_widget/include/**",
+        "/home/maysara/catkin_ws/src/dvrk-ros/dvrk_robot/include/**",
+        "/home/maysara/catkin_ws/src/cisst-saw/sawControllers/components/include/**",
+        "/home/maysara/catkin_ws/src/cisst-saw/sawIntuitiveResearchKit/components/include/**",
+        "/home/maysara/catkin_ws/src/cisst-saw/sawIntuitiveResearchKit/examples/derivedTeleOperationPSM/components/include/**",
+        "/home/maysara/catkin_ws/src/cisst-saw/sawKeyboard/components/include/**",
+        "/home/maysara/catkin_ws/src/cisst-saw/sawRobotIO1394/components/include/**",
+        "/home/maysara/catkin_ws/src/cisst-saw/sawTextToSpeech/components/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS"
+    }
+  ],
+  "version": 4
+}
