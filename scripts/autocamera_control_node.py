@@ -8,6 +8,7 @@ home the arms, switch between simulation and hardware and choose a camera contro
 method. It also provides the capability to record all the movements.
 """
 #QApplication
+#from xmlrpc.client import Boolean
 from __common_imports__ import *
 
 import sys
@@ -47,6 +48,13 @@ class Autocamera_node_handler:
         self.cam_info = {'left':CameraInfo(), 'right':CameraInfo()}
         
         self.last_ecm_jnt_pos = None
+
+        #Assistant Variables
+        self.run = True
+        self.track = "middle"
+        self.trackSet = False
+        self.keep = "middle"
+        self.keepSet = False
         
         self.first_run = True
         self.headsensor_active = False
@@ -148,6 +156,15 @@ class Autocamera_node_handler:
         self.pub_image_left = rospy.Publisher('autocamera_image_left', Image, queue_size=1)
         self.pub_image_right = rospy.Publisher('autocamera_image_right', Image, queue_size=1)
 
+        #dvrk Assistant callbacks
+        self.sub_run = rospy.Subscriber('/autocamera/run', Bool, self.runCallback, queue_size=1)
+        self.sub_track = rospy.Subscriber('/autocamera/track', String, self.trackCallback, queue_size=1)
+        self.sub_keep = rospy.Subscriber('/autocamera/keep', String, self.keepCallback, queue_size=1)
+        self.sub_find_tools = rospy.Subscriber('/autocamera/find_tools', Empty, self.findToolsCallback, queue_size=1)
+        self.sub_inner_zoom = rospy.Subscriber('/autocamera/inner_zoom_value', Float32, self.setInnerZoomCallback, queue_size=1)
+        self.sub_outer_zoom = rospy.Subscriber('/autocamera/outer_zoom_value', Float32, self.setOuterZoomCallback, queue_size=1)
+
+
     def shutdown(self):
         try:
             if self.__DEBUG_GRAPHICS__ == True:
@@ -174,6 +191,13 @@ class Autocamera_node_handler:
             self.hw_ecm.unregister()
             self.__hw_psm1__.unregister()
             self.__hw_psm2__.unregister()
+
+            self.sub_run.unregister()
+            self.sub_track.unregister()
+            self.sub_keep.unregister()
+            self.sub_find_tools.unregister()
+            self.sub_inner_zoom.unregister()
+            self.sub_outer_zoom.unregister()
             print( "Shutting down " + self.__class__.__name__)
             
         except Exception:
@@ -363,7 +387,7 @@ class Autocamera_node_handler:
 
     #Simulation mode callback for the ECM since PSM1 and PSM2 joint states are not subscribed too
     def add_ecm_jnt(self, msg):
-        if self.camera_clutch_pressed == False and msg is not None:
+        if self.run == True and self.camera_clutch_pressed == False and msg is not None:
             if self.__MOVE_ECM_WITH_SLIDERS__ == False:
                 #if self.__AUTOCAMERA_MODE__ == self.MODE.hardware:
                 #    msg.name = ['outer_yaw', 'outer_pitch', 'insertion', 'outer_roll']
@@ -502,6 +526,27 @@ class Autocamera_node_handler:
             MODE.hardware
         """
         self.__AUTOCAMERA_MODE__ = mode
+
+    def runCallback(self, msg):
+        self.run = msg.data
+
+    def trackCallback(self, msg):
+        self.track = msg.data
+        self.trackSet = True
+
+    def keepCallback(self, msg):
+        self.keep = msg.data
+        self.keepSet = True
+
+    def findToolsCallback(self, msg):
+        print('Finding Tools')
+
+    def setInnerZoomCallback(self, msg):
+        self.autocamera.zoom_innerzone_radius = msg.data
+
+    def setOuterZoomCallback(self, msg):
+        self.autocamera.zoom_deadzone_radius = msg.data
+
 
 def main():
     #class thread_autocamera(QThread):
