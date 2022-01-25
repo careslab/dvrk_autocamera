@@ -450,7 +450,7 @@ class Autocamera_node_handler:
             try:
                 old_zoom = self.joint_angles['ecm'].position[-2]
                 jnt_msg = 'error'
-                jnt_msg = self.autocamera.compute_viewangle(self.joint_angles, self.cam_info)
+                jnt_msg = self.autocamera.compute_viewangle(self.joint_angles, self.cam_info, self.track)
                 
                 self.pub_ecm.publish(jnt_msg)
                 
@@ -533,6 +533,7 @@ class Autocamera_node_handler:
     def trackCallback(self, msg):
         self.track = msg.data
         self.trackSet = True
+        self.autocamera.compute_viewangle(self.joint_angles, self.cam_info, self.track)  # This may not be necessary
 
     def keepCallback(self, msg):
         self.keep = msg.data
