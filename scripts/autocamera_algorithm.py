@@ -206,9 +206,9 @@ class Autocamera:
         
     
     def point_towards_midpoint(self, clean_joints, psm1_pos, psm2_pos, key_hole,ecm_pose, cam_info, pos_track):
-        if (pos_track == "left"):
+        if pos_track == 'left':
             mid_point = psm2_pos
-        elif (pos_track == "right"):
+        elif pos_track == 'right':
             mid_point = psm1_pos
         else:
             mid_point = (psm1_pos + psm2_pos)/2
