@@ -54,7 +54,6 @@ class Autocamera_node_handler:
         self.track = "middle"
         self.trackSet = False
         self.keep = "middle"
-        self.keepPos = None
         self.keepSet = False
         
         self.first_run = True
@@ -449,12 +448,6 @@ class Autocamera_node_handler:
                 time.sleep(.01)
                 self.initialize_psms_initialized -= 1
             try:
-                if self.keepSet:
-                    if self.keep == 'left':
-                        self.joint_angles['psm2'].position = self.keepPos 
-                    elif self.keep == 'right':
-                        self.joint_angles['psm1'].position = self.keepPos
-
                 old_zoom = self.joint_angles['ecm'].position[-2]
                 jnt_msg = 'error'
                 jnt_msg = self.autocamera.compute_viewangle(self.joint_angles, self.cam_info, self.track)
@@ -551,6 +544,8 @@ class Autocamera_node_handler:
             self.keepPos = self.joint_angles['psm1'].position
         if(not None in self.joint_angles.values()):
             self.autocamera.set_keep_pos(msg.data, self.joint_angles)  # Why msg.data and not self.keep?
+        if(not None in self.joint_angles.values()):
+            self.autocamera.set_keep_pos(msg.data, self.joint_angles)
 
     def findToolsCallback(self, msg):
         print('Finding Tools')
