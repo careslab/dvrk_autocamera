@@ -55,6 +55,8 @@ class Autocamera:
         
         self.tool_timer = {'last_psm1_pos':None, 'last_psm2_pos':None, 'psm1_stay_start_time':0, 'psm2_stay_start_time':0, 'psm1_stationary_duration':0, 'psm2_stationary_duration':0}
         
+        self.keepPos = None;
+        self.keepSet = False;
         
         self.last_midpoint = None
         self.midpoint_time = 0
@@ -74,6 +76,36 @@ class Autocamera:
             @param n : 1 or 2
         """
         self.method_number = n
+    
+    def set_keep_pos(self, tool, joint):
+        kinematics = lambda name: self.psm1_kin if name == 'psm1' else self.psm2_kin if name == 'psm2' else self.ecm_kin 
+        clean_joints = {}
+        try:
+            joint_names = joint.keys()
+            for j in joint_names:
+                clean_joints[j] = self.extract_positions(joint[j], j, kinematics(j))
+
+            if tool == 'right':
+                self.keepPos,_ = self.psm1_kin.FK(clean_joints['psm1'].position)
+                self.keepSet = True;
+            elif tool == 'left':
+                self.keepPos,_ = self.psm2_kin.FK(clean_joints['psm2'].position)
+                self.keepSet = True;
+            elif tool == 'middle':
+                self.keepSet = False;
+
+            print(self.keepSet)
+
+        except Exception as e:
+            rospy.logerr(e.message)
+            output_msg = joint['ecm']
+    #         output_msg.name = ['outer_yaw', 'outer_pitch', 'insertion', 'outer_roll']
+    #         output_msg.position = [joint['ecm'].position[x] for x in [0,1,5,6]]
+            return
+        
+        return
+
+
         
     def logerror(self, msg, debug = False):
         if self.DEBUG or debug:
@@ -208,10 +240,17 @@ class Autocamera:
     def point_towards_midpoint(self, clean_joints, psm1_pos, psm2_pos, key_hole,ecm_pose, cam_info, pos_track):
         if pos_track == 'left':
             mid_point = psm2_pos
+            if self.keepSet:
+                mid_point = (psm2_pos + self.keepPos)/2
         elif pos_track == 'right':
             mid_point = psm1_pos
+            if self.keepSet:
+                mid_point = (psm1_pos+self.keepPos)/2
         else:
             mid_point = (psm1_pos + psm2_pos)/2
+            if self.keepSet:
+                mid_point = (psm1_pos + psm2_pos + self.keepPos)/3
+
 #         diff = clean_joints['psm1'].position[2] - clean_joints['psm2'].position[2]
 #         if diff > 0:
 #             mid_point = (psm1_pos * (1+np.abs(diff)/1) + psm2_pos)/2
@@ -676,7 +715,6 @@ class Autocamera:
             psm2_pos,_ = self.psm2_kin.FK(clean_joints['psm2'].position)
             psm1_pose = self.psm1_kin.forward(clean_joints['psm1'].position)
             ecm_pose = self.ecm_kin.forward(clean_joints['ecm'].position)
-        
         
         except Exception as e:
             rospy.logerr(e.message)
