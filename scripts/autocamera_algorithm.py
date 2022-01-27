@@ -205,8 +205,13 @@ class Autocamera:
         vis_pub.publish(marker)
         
     
-    def point_towards_midpoint(self, clean_joints, psm1_pos, psm2_pos, key_hole,ecm_pose, cam_info):
-        mid_point = (psm1_pos + psm2_pos)/2
+    def point_towards_midpoint(self, clean_joints, psm1_pos, psm2_pos, key_hole,ecm_pose, cam_info, pos_track):
+        if pos_track == 'left':
+            mid_point = psm2_pos
+        elif pos_track == 'right':
+            mid_point = psm1_pos
+        else:
+            mid_point = (psm1_pos + psm2_pos)/2
 #         diff = clean_joints['psm1'].position[2] - clean_joints['psm2'].position[2]
 #         if diff > 0:
 #             mid_point = (psm1_pos * (1+np.abs(diff)/1) + psm2_pos)/2
@@ -658,7 +663,7 @@ class Autocamera:
                 self.tool_timer['psm2_stationary_duration'] = time.time() - self.tool_timer['psm2_stay_start_time']
             self.tool_timer['last_psm2_pos'] = joints['psm2'].position
     
-    def compute_viewangle(self, joint, cam_info):
+    def compute_viewangle(self, joint, cam_info, pos_track):
         kinematics = lambda name: self.psm1_kin if name == 'psm1' else self.psm2_kin if name == 'psm2' else self.ecm_kin 
         clean_joints = {}
         try:
@@ -694,7 +699,7 @@ class Autocamera:
         # Track when the tools are stationary
         self.track_tool_times(clean_joints)
         if gripper == gripper or gripper != gripper: # luke was here
-            output_msg = self.point_towards_midpoint(clean_joints, psm1_pos, psm2_pos, key_hole, ecm_pose, cam_info)
+            output_msg = self.point_towards_midpoint(clean_joints, psm1_pos, psm2_pos, key_hole, ecm_pose, cam_info, pos_track)
 #             output_msg.position =list( np.array(output_msg.position) + ( -np.array(output_msg.position)+ np.array(goal_joints.position)) *.0001)
             output_msg = self.find_zoom_level(output_msg, cam_info, clean_joints)
             pass
