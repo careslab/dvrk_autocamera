@@ -549,6 +549,8 @@ class Autocamera_node_handler:
             self.keepPos = self.joint_angles['psm2'].position
         elif self.keep == 'right':
             self.keepPos = self.joint_angles['psm1'].position
+        if(not None in self.joint_angles.values()):
+            self.autocamera.set_keep_pos(msg.data, self.joint_angles)  # Why msg.data and not self.keep?
 
     def findToolsCallback(self, msg):
         print('Finding Tools')
