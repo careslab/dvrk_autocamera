@@ -21,6 +21,7 @@ import tf
 from hrl_geom.pose_converter import PoseConv
 from hrl_geom import transformations
 
+from autocamera_viewpoint_scaling import CameraMovementScaling
 
 class Autocamera:
     """!
@@ -69,6 +70,8 @@ class Autocamera:
         
         self.zoom_level_positions = {'l1':None, 'r1':None, 'l2':None, 'r2':None, 'lm':None, 'rm':None}
         self.logerror("autocamera_initialized")
+
+        self.AVS = CameraMovementScaling()
         
     def set_method(self, n):
         """!
@@ -246,6 +249,8 @@ class Autocamera:
             mid_point = psm1_pos
             if self.keepSet:
                 mid_point = (psm1_pos+self.keepPos)/2
+        elif pos_track == 'AVS':
+            mid_point = self.AVS.update(psm1_pos, psm2_pos)
         else:
             mid_point = (psm1_pos + psm2_pos)/2
             if self.keepSet:
