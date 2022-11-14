@@ -569,5 +569,8 @@ def main():
     
 
 if __name__ == "__main__":
-    print("Starting..")
-    main()
+    rospy.loginfo("Running Autocamera")
+    try:
+        main()
+    except rospy.ROSInterruptException:
+        pass
