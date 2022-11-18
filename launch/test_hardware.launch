@@ -11,7 +11,7 @@
 
   <!-- psm one -->
   <include file="$(find dvrk_autocamera)/launch/psm_one_rviz.launch">
-    <arg name="model" default="$(find dvrk-_autocamera)/model/psm_one.urdf.xacro"/>
+    <arg name="model" default="$(find dvrk_autocamera)/model/psm_one.urdf.xacro"/>
     <arg name="rate" default="200" />
     <arg name="rviz" value="false"/>
     <arg name="ns" default="/dvrk_psm1"/>
